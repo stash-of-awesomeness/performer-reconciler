@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9c5a0a37bdd330b37fba43c34c3459b9cbb2c7bc210cb90ad90e5cc8a469a468"
+            "sha256": "7bd85b4761d1a30a870d5410dbcf6040e6e9845fb914cfebfc281042da2c2d32"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -729,7 +729,7 @@
                 "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
                 "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.16.0"
         },
         "sqlalchemy": {
@@ -771,6 +771,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.3.24"
+        },
+        "stashapp-tools": {
+            "hashes": [
+                "sha256:76ac0b78e27a264a12cd36a56ce730616dcd0fb7852460b778df6f9b6d4ae5fc",
+                "sha256:c29310bdcaaee97bc4703795f627a034ae98a6b5b520d84c0526deaee4e59f3b"
+            ],
+            "index": "pypi",
+            "version": "==0.2.56"
         },
         "tldextract": {
             "hashes": [
