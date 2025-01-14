@@ -1,4 +1,4 @@
-from performer_reconciler.items import Performer, Scene, SourceReference, Studio
+from performer_reconciler.items import Performer, Scene, SourceReference, Studio, Gender
 from urllib.parse import urljoin
 import scrapy
 
@@ -67,6 +67,11 @@ class IafdSpider(scrapy.Spider):
                 )
             )
 
+            yield scrapy.http.Request(
+                url=urljoin(response.url, performer_link.attrib["href"]),
+                callback=self.parse_performer,
+            )
+
         yield Scene(
             source_reference=response.url.split("=")[1],
             source_name="iafd",
@@ -86,5 +91,20 @@ class IafdSpider(scrapy.Spider):
         )
 
     def parse_performer(self, response):
-        pass
+        GENDER_MAP = {
+            "Man": Gender.MALE,
+            "Woman": Gender.FEMALE,
+        }
+
+        yield Performer(
+            source_reference=response.url.rsplit("=", 1)[1],
+            source_name="iafd",
+
+            name=response.css("h1::text").get(),
+            gender=GENDER_MAP[response.css(".bioheading:contains(Gender) + .biodata::text").get()],
+
+            urls=[
+                response.url,
+            ],
+        )
 

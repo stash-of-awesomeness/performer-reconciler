@@ -30,13 +30,13 @@ class EyeColor(enum.Enum):
     RED = enum.auto()
 
 
-class Gender(enum.Enum):
-    FEMALE = enum.auto()
-    INTERSEX = enum.auto()
-    MALE = enum.auto()
-    NON_BINARY = enum.auto()
-    TRANSGENDER_FEMALE = enum.auto()
-    TRANSGENDER_MALE = enum.auto()
+class Gender(str, enum.Enum):
+    FEMALE = "FEMALE"
+    INTERSEX = "INTERSEX"
+    MALE = "MALE"
+    NON_BINARY = "NON_BINARY"
+    TRANSGENDER_FEMALE = "TRANSGENDER_FEMALE"
+    TRANSGENDER_MALE = "TRANSGENDER_MALE"
 
 
 class HairColor(enum.Enum):
@@ -63,36 +63,37 @@ class Performer:
     source_name: str
 
     name: str
-    disambiguation: Optional[str]
-    aliases: list[str]
-
-    birth_date: Optional[str]
-    death_date: Optional[str]
-
-    ethnicity: Optional[Ethnicity]
-    country: Optional[str]
-
-    eye_color: Optional[EyeColor]
-    hair_color: Optional[HairColor]
-
-    height: Optional[int]
     gender: Gender
 
-    breast_type: Optional[BreastType]
-    cup_size: Optional[str]
-    band_size: Optional[int]
-    hip_size: Optional[int]
-    waist_size: Optional[int]
+    disambiguation: Optional[str] = ""
+    aliases: list[str] = field(default_factory=list)
 
-    career_start_year: Optional[int]
-    career_end_year: Optional[int]
+    birth_date: Optional[str] = ""
+    death_date: Optional[str] = ""
 
-    tattoos: list[BodyModification]
-    piercings: list[BodyModification]
+    ethnicity: Optional[Ethnicity] = None
+    country: Optional[str] = None
 
-    urls: list[str]
+    eye_color: Optional[EyeColor] = None
+    hair_color: Optional[HairColor] = None
 
-    image_url: Optional[str]
+    height: Optional[int] = 0
+
+    breast_type: Optional[BreastType] = None
+    cup_size: Optional[str] = ""
+    band_size: Optional[int] = 0
+    hip_size: Optional[int] = 0
+    waist_size: Optional[int] = 0
+
+    career_start_year: Optional[int] = 0
+    career_end_year: Optional[int] = 0
+
+    tattoos: list[BodyModification] = field(default_factory=list)
+    piercings: list[BodyModification] = field(default_factory=list)
+
+    urls: list[str] = field(default_factory=list)
+
+    image_url: Optional[str] = ""
 
 
 @dataclass
