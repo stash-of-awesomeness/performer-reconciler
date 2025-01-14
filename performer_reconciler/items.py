@@ -1,15 +1,15 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 import enum
 import scrapy
 
 
-class BreastType(enum.StrEnum):
+class BreastType(enum.Enum):
     AUGMENTED = enum.auto()
     NATURAL = enum.auto()
 
 
-class Ethnicity(enum.StrEnum):
+class Ethnicity(enum.Enum):
     ASIAN = enum.auto()
     BLACK = enum.auto()
     CAUCASIAN = enum.auto()
@@ -20,7 +20,7 @@ class Ethnicity(enum.StrEnum):
     OTHER = enum.auto()
 
 
-class EyeColor(enum.StrEnum):
+class EyeColor(enum.Enum):
     BLACK = enum.auto()
     BLUE = enum.auto()
     BROWN = enum.auto()
@@ -30,17 +30,16 @@ class EyeColor(enum.StrEnum):
     RED = enum.auto()
 
 
-class Gender(enum.StrEnum):
+class Gender(enum.Enum):
     FEMALE = enum.auto()
     INTERSEX = enum.auto()
     MALE = enum.auto()
     NON_BINARY = enum.auto()
-    INTERSEX = enum.auto()
     TRANSGENDER_FEMALE = enum.auto()
     TRANSGENDER_MALE = enum.auto()
 
 
-class HairColor(enum.StrEnum):
+class HairColor(enum.Enum):
     AUBURN = enum.auto()
     BALD = enum.auto()
     BLACK = enum.auto()
@@ -60,7 +59,7 @@ class BodyModification:
 
 @dataclass
 class Performer:
-    reference_id: str
+    source_reference: str
     source_name: str
 
     name: str
@@ -97,29 +96,40 @@ class Performer:
 
 
 @dataclass
+class SourceReference:
+    source_reference: str
+    source_name: str
+
+
+@dataclass
 class Scene:
-    reference_id: str
+    source_reference: str
     source_name: str
 
     title: str
     details: str
-    studio_code: Optional[str]
-    duration: Optional[int]
-    director: Optional[str]
 
-    tags = list[str]
+    studio: SourceReference
 
-    performers: list[Performer]
+    urls: list[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    performers: list[SourceReference] = field(default_factory=list)
 
-    release_date: Optional[str]
-    production_date = Optional[str]
+    studio_code: Optional[str] = ""
+    duration: Optional[int] = 0
+    director: Optional[str] = ""
 
-    urls = list[str]
-    cover_image_url: Optional[str]
+    release_date: Optional[str] = ""
+    production_date: Optional[str] = ""
+
+    cover_image_url: Optional[str] = ""
 
 
 @dataclass
 class Studio:
+    source_reference: str
+    source_name: str
+
     name: str
     urls: list[str]
 
