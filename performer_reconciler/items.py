@@ -9,25 +9,25 @@ class BreastType(enum.Enum):
     NATURAL = enum.auto()
 
 
-class Ethnicity(enum.Enum):
-    ASIAN = enum.auto()
-    BLACK = enum.auto()
-    CAUCASIAN = enum.auto()
-    INDIAN = enum.auto()
-    LATIN = enum.auto()
-    MIDDLE_EASTERN = enum.auto()
-    MIXED = enum.auto()
-    OTHER = enum.auto()
+class Ethnicity(str, enum.Enum):
+    ASIAN = "ASIAN"
+    BLACK = "BLACK"
+    CAUCASIAN = "CAUCASIAN"
+    INDIAN = "INDIAN"
+    LATIN = "LATIN"
+    MIDDLE_EASTERN = "MIDDLE_EASTERN"
+    MIXED = "MIXED"
+    OTHER = "OTHER"
 
 
-class EyeColor(enum.Enum):
-    BLACK = enum.auto()
-    BLUE = enum.auto()
-    BROWN = enum.auto()
-    GREEN = enum.auto()
-    GREY = enum.auto()
-    HAZEL = enum.auto()
-    RED = enum.auto()
+class EyeColor(str, enum.Enum):
+    BLACK = "BLACK"
+    BLUE = "BLUE"
+    BROWN = "BROWN"
+    GREEN = "GREEN"
+    GREY = "GREY"
+    HAZEL = "HAZEL"
+    RED = "RED"
 
 
 class Gender(str, enum.Enum):
@@ -39,16 +39,16 @@ class Gender(str, enum.Enum):
     TRANSGENDER_MALE = "TRANSGENDER_MALE"
 
 
-class HairColor(enum.Enum):
-    AUBURN = enum.auto()
-    BALD = enum.auto()
-    BLACK = enum.auto()
-    BLONDE = enum.auto()
-    BRUNETTE = enum.auto()
-    GREY = enum.auto()
-    RED = enum.auto()
-    VARIOUS = enum.auto()
-    WHITE = enum.auto()
+class HairColor(str, enum.Enum):
+    AUBURN = "AUBURN"
+    BALD = "BALD"
+    BLACK = "BLACK"
+    BLONDE = "BLONDE"
+    BRUNETTE = "BRUNETTE"
+    GREY = "GREY"
+    RED = "RED"
+    VARIOUS = "VARIOUS"
+    WHITE = "WHITE"
 
 
 @dataclass
@@ -78,6 +78,7 @@ class Performer:
     hair_color: Optional[HairColor] = None
 
     height: Optional[int] = 0
+    weight: Optional[int] = 0
 
     breast_type: Optional[BreastType] = None
     cup_size: Optional[str] = ""

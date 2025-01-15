@@ -44,7 +44,7 @@ DOWNLOAD_DELAY = 1
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    "performer_reconciler.middlewares.CloudScraperMiddleware": 543,
+    "performer_reconciler.middlewares.CloudScraperMiddleware": 950,
     "scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware": None,
 }
 
@@ -76,17 +76,16 @@ DOWNLOADER_MIDDLEWARES = {
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
 HTTPCACHE_ENABLED = True
-HTTPCACHE_EXPIRATION_SECS = 6 * 60 * 60
+HTTPCACHE_EXPIRATION_SECS = 12 * 60 * 60
 HTTPCACHE_DIR = "/tmp/httpcache"
 HTTPCACHE_IGNORE_HTTP_CODES = [404, 500]
 HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 location_base = (pathlib.Path(__file__) / ".." / ".." / "scraped_data").resolve().as_posix()
 
-studio_location = location_base + "/%(name)s-studios.jsonl"
-performer_location = location_base + "/%(name)s-performers.jsonl"
-scene_location = location_base + "/%(name)s-scenes.jsonl"
-
+studio_location = location_base + "/%(result_prefix)s-studios.jsonl"
+performer_location = location_base + "/%(result_prefix)s-performers.jsonl"
+scene_location = location_base + "/%(result_prefix)s-scenes.jsonl"
 
 feed_settings = {
     "format": "jsonlines",
