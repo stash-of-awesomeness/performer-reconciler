@@ -17,7 +17,6 @@ class CloudScraperMiddleware:
             headers=response.headers,
             status=response.status_code,
             body=response.content,
-            encoding="utf-8",
             request=request,
         )
 
