@@ -30,7 +30,7 @@ class GeviSpider(scrapy.Spider):
                     callback=self.parse_performers,
                 )
 
-    def _url_for_performers(self, search, limit=50, offset=0):
+    def _url_for_performers(self, search, limit=100, offset=0):
         return f"https://gayeroticvideoindex.com/shpr?length={limit}&start={offset}&search%5Bvalue%5D={search}"
 
     def parse_performers(self, response):
@@ -39,15 +39,15 @@ class GeviSpider(scrapy.Spider):
         parsed_url = urlparse(response.url)
         parsed_params = parse_qs(parsed_url.query)
 
-        current_page = int(parsed_params["start"][0]) // 25
-        last_page = data["recordsFiltered"] // 25
+        current_page = int(parsed_params["start"][0]) // 100
+        last_page = data["recordsFiltered"] // 100
 
         if current_page < last_page:
             yield scrapy.http.JsonRequest(
-                url=self._url_for_performers(parsed_params["search[value]"][0], limit=25, offset=(current_page + 1) * 25),
+                url=self._url_for_performers(parsed_params["search[value]"][0], limit=100, offset=(current_page + 1) * 100),
                 callback=self.parse_performers,
             )
-        
+
         for performer in data["data"]:
             link = scrapy.Selector(text=performer[1]).css("a")
 
@@ -188,11 +188,14 @@ class GeviSpider(scrapy.Spider):
             if len(country) == 2 and country not in ["UK"]:
                 country = "United States"
 
+        performer_id = response.url.split("/")[-1]
+        performer_name = data_container.css("h1::text").get().split(" (", 1)[0]
+
         yield Performer(
-            source_reference=response.url.split("/")[-1],
+            source_reference=performer_id,
             source_name="gevi",
 
-            name=data_container.css("h1::text").get().split(" (", 1)[0],
+            name=performer_name,
             gender=Gender.MALE,
 
             ethnicity=ethnicity,
@@ -210,11 +213,93 @@ class GeviSpider(scrapy.Spider):
             ],
         )
 
-    def parse_scenes(self, response):
-        pass
+        yield scrapy.http.JsonRequest(
+            url=self._url_for_performer_episodes(performer_id, performer_name),
+            callback=self.parse_episodes,
+        )
+
+    def _url_for_performer_episodes(self, performer_id, performer_name, limit=100, offset=0):
+        return f"https://gayeroticvideoindex.com/prep?start={offset}&length={limit}&search[value]=&NameKey={performer_id}&PerformerName={performer_name}"
+
+    def parse_episodes(self, response):
+        data = response.json()
+
+        parsed_url = urlparse(response.url)
+        parsed_params = parse_qs(parsed_url.query)
+
+        performer_id = parsed_params["NameKey"][0]
+        performer_name = parsed_params["PerformerName"][0]
+        current_page = int(parsed_params["start"][0]) // 100
+        last_page = data["recordsFiltered"] // 100
+
+        if current_page < last_page:
+            yield scrapy.http.JsonRequest(
+                url=self._url_for_performer_episodes(performer_id, performer_name, limit=100, offset=(current_page + 1) * 100),
+                callback=self.parse_episodes,
+            )
+
+        for scene in data["data"]:
+            link = scrapy.Selector(text=scene[2]).css("a")
+
+            scene_url = urljoin(response.url, link.attrib["href"])
+
+            yield scrapy.http.Request(
+                url=scene_url,
+                callback=self.parse_episode,
+            )
 
     def parse_episode(self, response):
-        pass
+        data_container = response.css("#data > section")
+
+        scene_id = "episode/" + response.url.rsplit("/", 1)[1]
+
+        scene_name = data_container.css("h1::text").get().strip()
+
+        if scene_cover := data_container.css("img[alt][src].hidden"):
+            scene_cover = urljoin(urljoin(response.url, "/"), scene_cover.attrib["src"])
+        else:
+            scene_cover = None
+
+        scene_details = data_container.css("div.text-justify.wideCols-1 > p.mb-2 span::text")
+
+        if scene_details:
+            scene_details = "\n\n".join(scene_detail.get().strip() for scene_detail in scene_details)
+            scene_details = scene_details.replace("\u2019", "'").replace("\u00a0", " ")
+        else:
+            scene_details = ""
+
+        performers = []
+
+        scene_credits = data_container.css("div > table > tbody > tr.border-b > td > a")
+        for scene_performer in scene_credits:
+            performer = SourceReference(
+                source_reference=scene_performer.attrib["href"].split("/")[-1],
+                source_name="gevi",
+            )
+
+            performers.append(performer)
+
+        studio_link = data_container.css(".font-bold > a")
+        studio_id = studio_link.attrib["href"].rsplit("/", 1)[1]
+
+        yield Scene(
+            source_reference=scene_id,
+            source_name="gevi",
+
+            title=scene_name,
+            details=scene_details,
+
+            studio=SourceReference(
+                source_reference=studio_id,
+                source_name="gevi",
+            ),
+            performers=performers,
+
+            cover_image_url=scene_cover,
+            urls=[
+                response.url,
+            ]
+        )
     
     def parse_video(self, response):
         pass
