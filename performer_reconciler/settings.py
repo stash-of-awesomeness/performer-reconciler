@@ -78,7 +78,7 @@ DOWNLOADER_MIDDLEWARES = {
 HTTPCACHE_ENABLED = True
 HTTPCACHE_EXPIRATION_SECS = 12 * 60 * 60
 HTTPCACHE_DIR = "/tmp/httpcache"
-HTTPCACHE_IGNORE_HTTP_CODES = [404, 500]
+HTTPCACHE_IGNORE_HTTP_CODES = [400, 401, 403, 404, 429, 500]
 HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 location_base = (pathlib.Path(__file__) / ".." / ".." / "scraped_data").resolve().as_posix()
