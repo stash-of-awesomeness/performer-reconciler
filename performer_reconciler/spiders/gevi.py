@@ -282,6 +282,11 @@ class GeviSpider(scrapy.Spider):
         studio_link = data_container.css(".font-bold > a")
         studio_id = studio_link.attrib["href"].rsplit("/", 1)[1]
 
+        yield scrapy.http.Request(
+            url=f"https://gayeroticvideoindex.com/company/{studio_id}",
+            callback=self.parse_company,
+        )
+
         yield Scene(
             source_reference=scene_id,
             source_name="gevi",
@@ -303,3 +308,19 @@ class GeviSpider(scrapy.Spider):
     
     def parse_video(self, response):
         pass
+
+    def parse_company(self, response):
+        data_container = response.css("#data > section")
+
+        studio_id = response.url.rsplit("/", 1)[1]
+        studio_name = data_container.css("h1::text").get()
+
+        yield Studio(
+            source_reference=studio_id,
+            source_name="gevi",
+
+            name=studio_name,
+            urls=[
+                response.url,
+            ]
+        )
