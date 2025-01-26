@@ -76,21 +76,31 @@ DOWNLOADER_MIDDLEWARES = {
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
 HTTPCACHE_ENABLED = True
-HTTPCACHE_EXPIRATION_SECS = 12 * 60 * 60
+HTTPCACHE_EXPIRATION_SECS = 72 * 60 * 60
 HTTPCACHE_DIR = "/tmp/httpcache"
-HTTPCACHE_IGNORE_HTTP_CODES = [400, 401, 403, 404, 429, 500]
+HTTPCACHE_IGNORE_HTTP_CODES = [
+    400, 401, 403, 404,
+    # Rate limiting
+    429,
+    500, 502, 503, 504,
+    # Cloudflare-specific codes
+    520, 521, 522, 523, 524, 525, 526,
+]
 HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 location_base = (pathlib.Path(__file__) / ".." / ".." / "scraped_data").resolve().as_posix()
 
-studio_location = location_base + "/%(result_prefix)s-studios.jsonl"
-performer_location = location_base + "/%(result_prefix)s-performers.jsonl"
-scene_location = location_base + "/%(result_prefix)s-scenes.jsonl"
+studio_location = location_base + "/%(result_prefix)s-studios.jsonl.xz"
+performer_location = location_base + "/%(result_prefix)s-performers.jsonl.xz"
+scene_location = location_base + "/%(result_prefix)s-scenes.jsonl.xz"
 
 feed_settings = {
     "format": "jsonlines",
     "encoding": "utf-8",
     "overwrite": True,
+    "postprocessing": [
+        "scrapy.extensions.postprocessing.LZMAPlugin",
+    ]
 }
 
 FEEDS = {
