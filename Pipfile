@@ -8,6 +8,8 @@ scrapy = "*"
 scrapyd = "*"
 scrapydweb = "*"
 stashapp-tools = "*"
+notebook = "*"
+pandas = "*"
 
 [dev-packages]
 
