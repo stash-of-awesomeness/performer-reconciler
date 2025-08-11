@@ -10,6 +10,7 @@ scrapydweb = "*"
 stashapp-tools = "*"
 notebook = "*"
 pandas = "*"
+cloudscraper = "*"
 
 [dev-packages]
 
