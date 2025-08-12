@@ -1,4 +1,4 @@
-from performer_reconciler.items import Performer, Scene, Studio, SourceReference, Gender
+from performer_reconciler.items import Link, LinkQuality, LinkSite, Performer, Scene, Studio, SourceReference, Gender
 
 from datetime import datetime
 from urllib.parse import urljoin
@@ -32,8 +32,12 @@ class SpunkWorthySpider(scrapy.Spider):
 
             name="SpunkWorthy",
             urls=[
-                "https://spunkworthy.com",
-            ],
+                Link(
+                    site=LinkSite.HOME_PAGE,
+                    quality=LinkQuality.SOURCE,
+                    url="https://spunkworthy.com",
+                )
+            ]
         )
 
     def _next_url(self, response):

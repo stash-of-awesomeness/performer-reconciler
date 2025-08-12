@@ -1,4 +1,4 @@
-from performer_reconciler.items import Performer, Scene, Studio, SourceReference, Gender
+from performer_reconciler.items import Link, LinkQuality, LinkSite, Performer, Scene, Studio, SourceReference, Gender
 
 from datetime import datetime
 from urllib.parse import urljoin
@@ -18,6 +18,23 @@ class LibertyMediaSpider(scrapy.Spider):
                 url=f"{self.trailer_prefix}/categories/{category}/1/name/",
                 callback=self.parse_category,
             )
+
+        yield Studio(
+            source_reference=self.name,
+            source_name=self.result_prefix,
+
+            name=self.name,
+            urls=[
+                Link(
+                    site=LinkSite.HOME_PAGE,
+                    quality=LinkQuality.SOURCE,
+                    url=self.trailer_prefix.split(".com")[0] + ".com",
+                )
+            ]
+        )
+
+    def _id_from_url(self, url):
+        return url.rsplit("/")[-1].split(".")[0]
 
     def parse_category(self, response):
         for scene in response.css(".container .items.update-items .item.item-update a[title]"):
@@ -46,9 +63,13 @@ class LibertyMediaSpider(scrapy.Spider):
                 hours, minutes, seconds = duration.split(":")
                 duration = int(hours) * 3600 + int(minutes) * 60 + int(seconds)
 
+        details = response.css(".description p::text").get()
+        if details:
+            details = details.strip()
+
         scene = Scene(
             source_name=self.result_prefix,
-            source_reference=response.url.rsplit("/")[-1].split(".")[0],
+            source_reference=self._id_from_url(response.url),
 
             studio=SourceReference(
                 source_reference=self.result_prefix,
@@ -56,28 +77,36 @@ class LibertyMediaSpider(scrapy.Spider):
             ),
 
             title=response.css("h1::text").get().strip(),
-            details=response.css(".description p::text").get().strip(),
+            details=details,
             duration=duration,
+
+            cover_image_url=response.css(".player-thumb .stdimage").attrib.get("src0_1x"),
 
             release_date=datetime.strptime(
                 release_date,
                 "%B %d, %Y",
             ).date(),
 
-            urls=[response.url],
+            urls=[
+                Link(
+                    site=LinkSite.STUDIO,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                )
+            ],
         )
 
         for performer in response.css(".modelFeaturing ul > li > a"):
             scene.performers.append(
-                Performer(
+                SourceReference(
                     source_name=self.result_prefix,
-                    source_reference=performer.attrib["href"].rsplit("/")[-1].split(".")[0],
-
-                    name=performer.css("::text").get().strip(),
-                    urls=[urljoin(response.url, performer.attrib["href"])],
-
-                    gender=Gender.MALE,
+                    source_reference=self._id_from_url(performer.attrib["href"]),
                 )
+            )
+
+            yield scrapy.http.Request(
+                url=performer.attrib["href"],
+                callback=self.parse_performer,
             )
 
         yield scene
@@ -85,7 +114,7 @@ class LibertyMediaSpider(scrapy.Spider):
     def parse_performers(self, response):
         for performer in response.css(".container .items.model-items .item.item-model a[title]"):
             yield scrapy.http.Request(
-                url=urljoin(response.url, performer.attrib["href"]),
+                url=performer.attrib["href"],
                 callback=self.parse_performer,
             )
 
@@ -98,12 +127,19 @@ class LibertyMediaSpider(scrapy.Spider):
     def parse_performer(self, response):
         performer = Performer(
             source_name=self.result_prefix,
-            source_reference=response.url.rsplit("/")[-1].split(".")[0],
+            source_reference=self._id_from_url(response.url),
 
             name=response.css("h1::text").get().strip(),
-            urls=[response.url],
 
             gender=Gender.MALE,
+
+            urls=[
+                Link(
+                    site=LinkSite.STUDIO,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                )
+            ]
         )
 
         yield performer
