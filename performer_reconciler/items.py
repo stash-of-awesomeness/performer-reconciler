@@ -61,6 +61,7 @@ class LinkQuality(str, enum.Enum):
     SOURCE = "SOURCE"
     CURATED = "CURATED"
     AGGREGATED = "AGGREGATED"
+    NON_CANONICAL = "NON_CANONICAL"
     USER_EDITED = "USER_EDITED"
     UNKNOWN = "UNKNOWN"
 
