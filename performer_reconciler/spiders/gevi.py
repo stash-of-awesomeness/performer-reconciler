@@ -1,5 +1,5 @@
 from performer_reconciler.items import (
-    Performer, Scene, Studio, SourceReference,
+    Link, LinkQuality, LinkSite, Performer, Scene, Studio, SourceReference,
     Ethnicity, EyeColor, Gender, HairColor,
 )
 
@@ -145,7 +145,13 @@ class GeviSpider(scrapy.Spider):
             normalized_link = link.attrib["href"]
 
             if normalized_link:
-                links.append(normalized_link)
+                links.append(
+                    Link(
+                        site=LinkSite.STUDIO,
+                        quality=LinkQuality.AGGREGATED,
+                        url=normalized_link,
+                    )
+                )
 
         performer_attributes = data_container.css(".flex .flex-col > .border .columns-2 .items-start")
 
@@ -208,7 +214,11 @@ class GeviSpider(scrapy.Spider):
             weight=weight,
 
             urls=[
-                response.url,
+                Link(
+                    site=LinkSite.GEVI,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                ),
                 *links,
             ],
         )
@@ -302,7 +312,11 @@ class GeviSpider(scrapy.Spider):
 
             cover_image_url=scene_cover,
             urls=[
-                response.url,
+                Link(
+                    site=LinkSite.GEVI,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                ),
             ]
         )
     
@@ -321,6 +335,10 @@ class GeviSpider(scrapy.Spider):
 
             name=studio_name,
             urls=[
-                response.url,
+                Link(
+                    site=LinkSite.HOME_PAGE,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                ),
             ]
         )

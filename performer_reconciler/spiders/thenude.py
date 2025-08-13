@@ -1,5 +1,5 @@
 from performer_reconciler.items import (
-    Performer, Scene, Studio, SourceReference,
+    Link, LinkQuality, LinkSite, Performer, Scene, Studio, SourceReference,
     Ethnicity, EyeColor, Gender, HairColor,
 )
 import scrapy
@@ -75,7 +75,7 @@ class TheNudeSpider(scrapy.Spider):
         ethnicity = None
         if ethnicity := bio_list.css("li:contains(Ethnicity)::text").get():
             ethnicity = ETHNICITY_MAP[ethnicity]
-        
+
         country = None
         if country := bio_list.css("li:contains(Birthplace)::text").get():
             country = country.strip()
@@ -104,6 +104,11 @@ class TheNudeSpider(scrapy.Spider):
             hair_color=hair_color,
 
             urls=[
-                response.url,
+                Link(
+                    site=LinkSite.THENUDE,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                ),
+                *links,
             ],
         )

@@ -1,5 +1,5 @@
 from performer_reconciler.items import (
-    Performer, Scene, SourceReference, Studio,
+    Link, LinkQuality, LinkSite, Performer, Scene, SourceReference, Studio,
     Ethnicity, EyeColor, Gender, HairColor,
 )
 from datetime import datetime
@@ -70,7 +70,11 @@ class IafdSpider(scrapy.Spider):
 
             name=studio_name,
             urls=[
-                f"https://www.iafd.com/studio.rme/studio={studio_id}",
+                Link(
+                    site=LinkSite.IAFD,
+                    quality=LinkQuality.SOURCE,
+                    url=f"https://www.iafd.com/studio.rme/studio={studio_id}",
+                ),
             ],
         )
 
@@ -132,7 +136,11 @@ class IafdSpider(scrapy.Spider):
             performers=performers,
  
             urls=[
-                response.url,
+                Link(
+                    site=LinkSite.IAFD,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                )
             ],
         )
 
@@ -378,6 +386,7 @@ class IafdSpider(scrapy.Spider):
 
         performer_websites = response.css("a[target=starlet][href]")
         links = [website.attrib["href"] for website in performer_websites]
+        links = [Link(site=LinkSite.UNKNOWN, quality=LinkQuality.AGGREGATED, url=link) for link in links if link]
 
         ethnicity = response.css(".bioheading:contains(Ethnicity) + .biodata::text").get()
         if "/" in ethnicity:
@@ -448,7 +457,11 @@ class IafdSpider(scrapy.Spider):
             image_url=performer_image,
 
             urls=[
-                response.url,
+                Link(
+                    site=LinkSite.IAFD,
+                    quality=LinkQuality.SOURCE,
+                    url=response.url,
+                ),
                 *links,
             ],
         )
