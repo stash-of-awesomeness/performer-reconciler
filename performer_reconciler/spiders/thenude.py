@@ -2,6 +2,7 @@ from performer_reconciler.items import (
     Link, LinkQuality, LinkSite, Performer, Scene, Studio, SourceReference,
     Ethnicity, EyeColor, Gender, HairColor,
 )
+from datetime import datetime
 import scrapy
 import string
 
@@ -89,6 +90,40 @@ class TheNudeSpider(scrapy.Spider):
             else:
                 height = int(height)
 
+        birth_date = ""
+        if birth_date := bio_list.css("li:contains(Born)::text").get():
+            birth_date = birth_date.strip()
+            if birth_date:
+                try:
+                    birth_date = datetime.strptime("1 " + birth_date, "%d %B %Y").date()
+                    birth_date = birth_date.isoformat().rsplit("-", 1)[0]
+                except ValueError:
+                    birth_date = ""
+
+        career_start_year = 0
+        if career_start_year := bio_list.css("li:contains('First Seen')::text").get():
+            try:
+                career_start_year = int(career_start_year.strip())
+            except ValueError:
+                career_start_year = 0
+
+        career_end_year = 0
+        if career_end_year := bio_list.css("li:contains('Last Seen')::text").get():
+            try:
+                career_end_year = int(career_end_year.strip())
+            except ValueError:
+                career_end_year = 0
+
+        links = []
+        for link in response.css(".model-model-links .tnap_out_link"):
+            links.append(
+                Link(
+                    site=LinkSite.UNKNOWN,
+                    quality=LinkQuality.AGGREGATED,
+                    url=link.attrib["href"],
+                )
+            )
+
         yield Performer(
             source_reference=model_id,
             source_name="thenude",
@@ -96,12 +131,17 @@ class TheNudeSpider(scrapy.Spider):
             name=response.css("h1 > .model-name::text").get(),
             gender=Gender.FEMALE,
 
+            birth_date=birth_date,
+
             country=country,
             ethnicity=ethnicity,
 
             height=height,
 
             hair_color=hair_color,
+
+            career_start_year=career_start_year,
+            career_end_year=career_end_year,
 
             urls=[
                 Link(
