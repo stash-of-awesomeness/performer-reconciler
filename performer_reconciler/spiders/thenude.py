@@ -19,6 +19,12 @@ class TheNudeSpider(scrapy.Spider):
                 callback=self.parse_models,
             )
 
+        for letter in string.ascii_lowercase + string.digits:
+            yield scrapy.http.Request(
+                url=f"https://www.thenude.com/index.php?page=cover_index&letter={letter}",
+                callback=self.parse_sites,
+            )
+
     def _normalize_model_url(self, model_url):
         model_id = model_url.rsplit("_", 1)[1].split(".")[0]
 
@@ -148,6 +154,47 @@ class TheNudeSpider(scrapy.Spider):
                     site=LinkSite.THENUDE,
                     quality=LinkQuality.SOURCE,
                     url=response.url,
+                ),
+                *links,
+            ],
+        )
+
+    def parse_sites(self, response):
+        site_links = response.css(".three-col-list.list-group > li > a")
+
+        for site in site_links:
+            yield scrapy.http.Request(
+                url=site.attrib["href"],
+                callback=self.parse_site,
+            )
+
+    def parse_site(self, response):
+        breadcrumbs = response.css(".breadcrumbs-left > a")
+        site_link = breadcrumbs[2]
+
+        site_id = site_link.attrib["href"].rsplit("/", 2)[1]
+        site_name = site_link.css("::text").get().replace("Videos & Photosets", "").strip()
+
+        links = []
+        for link in response.css(".reviews > div > p:contains('Reviewed by') > a"):
+            links.append(
+                Link(
+                    site=LinkSite.UNKNOWN,
+                    quality=LinkQuality.AGGREGATED,
+                    url=link.attrib["href"],
+                )
+            )
+
+        yield Studio(
+            source_reference=site_id,
+            source_name="thenude",
+
+            name=site_name,
+            urls=[
+                Link(
+                    site=LinkSite.THENUDE,
+                    quality=LinkQuality.SOURCE,
+                    url=site_link.attrib["href"],
                 ),
                 *links,
             ],
