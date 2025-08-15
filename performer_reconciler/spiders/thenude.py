@@ -82,7 +82,7 @@ class TheNudeSpider(scrapy.Spider):
             country = country.strip()
 
         height = None
-        if height := bio_list.css("li:contains(Height)::text").get():
+        if height := bio_list.css("li:contains('Height:')::text").get():
             height = height.split(" ", 1)[0].strip()
 
             if height in ["???", ""]:
@@ -91,7 +91,7 @@ class TheNudeSpider(scrapy.Spider):
                 height = int(height)
 
         birth_date = ""
-        if birth_date := bio_list.css("li:contains(Born)::text").get():
+        if birth_date := bio_list.css("li:contains('Born:')::text").get():
             birth_date = birth_date.strip()
             if birth_date:
                 try:
