@@ -76,7 +76,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
 HTTPCACHE_ENABLED = True
-HTTPCACHE_EXPIRATION_SECS = 72 * 60 * 60
+HTTPCACHE_EXPIRATION_SECS = 30 * 24 * 60 * 60
 HTTPCACHE_DIR = "/tmp/httpcache"
 HTTPCACHE_IGNORE_HTTP_CODES = [
     400, 401, 403, 404,
