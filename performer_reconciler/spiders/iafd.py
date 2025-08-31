@@ -92,7 +92,10 @@ class IafdSpider(scrapy.Spider):
         scene_title = response.css("h1::text").get().rsplit(" (", 1)[0]
         studio_link = response.css(".bioheading:contains('Studio') + .biodata > a")
 
-        studio_id = studio_link.attrib["href"].rsplit("/", 2)[1].split("=")[1]
+        if studio_link is None or "href" not in studio_link.attrib:
+            return
+        else:
+            studio_id = studio_link.attrib["href"].rsplit("/", 2)[1].split("=")[1]
 
         scene_date = response.css(".bioheading:contains('Release Date') + .biodata::text").get()
 
@@ -229,24 +232,32 @@ class IafdSpider(scrapy.Spider):
             "Gray": EyeColor.GREY,
             "Green": EyeColor.GREEN,
             "Hazel": EyeColor.HAZEL,
+            "Hazel / Green": EyeColor.HAZEL,
+            "Heterochromia": None,
             "LightBrown": EyeColor.BROWN,
+            "Light Brown": EyeColor.BROWN,
             "Red": None,
             "Unknown": None,
         }
 
         NATIONALITY_MAP = {
+            "Afghan": "Afghanistan",
             "African American": "United States",
             "Albanian": "Albania",
             "Algerian": "Algeria",
             "American": "United States",
             "Andorran": "Andorra",
             "Angolan": "Angola",
+            "Antillean": "Antilles",
             "Arabic": None,
             "Argentinian": "Argentina",
             "Armenian": "Armenia",
+            "Aruban": "Aruba",
             "Australian": "Australia",
             "Austrian": "Austria",
+            "Azerbaijani": "Azerbaijan",
             "Bahamian": "Bahamas",
+            "Bangladeshi": "Bangladesh",
             "Barbadian": "Barbados",
             "Belarusian": "Belarus",
             "Belarussian": "Belarus",
@@ -257,20 +268,29 @@ class IafdSpider(scrapy.Spider):
             "Bosnian": "Bosnia",
             "Brazilian": "Brazil",
             "British": "UK",
+            "Bruneian": "Brunei",
             "Bulgarian": "Bulgaria",
+            "Burmese": "Myanmar",
+            "Buryat": "Russia",
             "Cambodian": "Cambodia",
+            "Cameroon": "Cameroon",
+            "Cameroonian": "Cameroon",
             "Canadian": "Canada",
             "Cape Verdean": "Cape Verde",
             "Caribbean": None,
+            "Catalan": "Spain",
             "Cherokee": "United States",
             "Chilean": "Chile",
             "Chinese": "China",
             "Colombian": "Colombia",
             "Congolese": "Democratic Republic of the Congo",
             "Costa Rican": "Costa Rica",
+            "Cree": None,
             "Creole": None,
             "Croatian": "Croatia",
+            "Cruzan": "St. Croix",
             "Cuban": "Cuba",
+            "Cypriot": "Cyprus",
             "Czech": "Czechia",
             "Danish": "Denmark",
             "Dominican": "Dominican Republic",
@@ -279,6 +299,7 @@ class IafdSpider(scrapy.Spider):
             "Ecuadorian": "Ecuador",
             "Egyptian": "Egypt",
             "English": "UK",
+            "Equatorial Guinean": "Equatorial Guinea",
             "Eritrean": "Eritrea",
             "Estonian": "Estonia",
             "Ethiopean": "Ethiopea",
@@ -294,18 +315,23 @@ class IafdSpider(scrapy.Spider):
             "Guamanian": "Guam",
             "Guatemalan": "Guatemala",
             "Guinean": "Guinea",
+            "Guyanese": "Guyana",
+            "Haitian": "Haiti",
             "Hawaiian": "United States",
             "Honduran": "Honduras",
             "Hungarian": "Hungary",
             "Icelandic": "Iceland",
             "Indian": "India",
             "Indonesian": "Indonesia",
+            "Iranian": "Iran",
+            "Iraqi": "Iraq",
             "Irish": "Ireland",
             "Israeli": "Israel",
             "Italian": "Italy",
             "Jamaican": "Jamaica",
             "Japanese": "Japan",
             "Jewish": None,
+            "Jordanian": "Jordan",
             "Kazakh": "Kazakhstan",
             "Kazakhstani": "Kazakhstan",
             "Kenyan": "Kenya",
@@ -314,6 +340,7 @@ class IafdSpider(scrapy.Spider):
             "Laotian": "Laos",
             "Latvian": "Latvia",
             "Lebanese": "Lebanon",
+            "Liberian": "Liberia",
             "liSwati": None,
             "Lithuanian": "Lithuania",
             "Luxembourger": "Luxembourg",
@@ -321,10 +348,19 @@ class IafdSpider(scrapy.Spider):
             "Malagasy": "Madagascar",
             "Malaysian": "Malaysia",
             "Maltese": "Malta",
+            "Mauritanian": "Mauritania",
+            "Mauritian": "Mauritius",
             "Mexican": "Mexico",
             "Moldavian": "Moldovo",
+            "Malian": "Mali",
+            "Maltese": "Malta",
             "Mongolian": "Mongolia",
+            "Montenegrin": "Montenegro",
             "Moroccan": "Morocco",
+            "Mulatto": None,
+            "Namibian": "Namibia",
+            "Nepalese": "Nepal",
+            "Nepali": "Nepal",
             "Native American": "United States",
             "Navaho": "United States",
             "New Zealander": "New Zealand",
@@ -337,16 +373,21 @@ class IafdSpider(scrapy.Spider):
             "Palestinian": "Palestine",
             "Panamanian": "Panama",
             "Paraguayan": "Paraguay",
+            "Pennsylvania Dutch": "United States",
             "Persian": None,
             "Peruvian": "Peru",
             "Polish": "Poland",
             "Polynesian": None,
             "Portuguese": "Portugal",
             "Puerto Rican": "Puerto Rico",
+            "Punjabi": None,
+            "Reunionese": "Reunion",
             "Romani": None,
             "Romanian": "Romania",
             "Russian": "Russia",
             "Rwandan": "Rwanda",
+            "Saint Lucian": "Saint Lucia",
+            "Salvadoran": "El Salvador",
             "Salvadorean": "El Salvadore",
             "Samoan": "Samoa",
             "Scottish": "UK",
@@ -357,18 +398,23 @@ class IafdSpider(scrapy.Spider):
             "Slovak": "Slovakia",
             "Slovenian": "Slovenia",
             "South African": "South Africa",
+            "South Asian": None,
             "Spanish": "Spain",
             "Surinamese": "Surinam",
             "Swedish": "Sweden",
             "Swiss": "Switzerland",
             "Syrian": "Syria",
+            "Tadzhik": "Tajikistan",
+            "Tahitian": "Tahiti",
             "Taiwanese": "Taiwan",
+            "Tatar": None,
             "Thai": "Thailand",
             "Togan": None,
             "Togolese": "Togo",
             "Trinidadian": "Trinidad and Tobago",
             "Tunisian": "Tunisia",
             "Turkish": "Turkey",
+            "Turkmen": "Turkmenistan",
             "Ugandan": "Uganda",
             "Ukrainian": "Ukraine",
             "Unknown": None,
@@ -377,10 +423,16 @@ class IafdSpider(scrapy.Spider):
             "Venezuelan": "Venezuela",
             "Vietnamese": "Vietnam",
             "Welsh": "UK",
+            "West-Indian": None,
             "Yugoslavian": "Yugoslavia",
         }
 
-        performer_image = response.css("#headshot img").attrib["src"]
+        if gender := response.css(".bioheading:contains(Gender) + .biodata::text").get():
+            gender = GENDER_MAP[gender]
+        else:
+            return
+
+        performer_image = response.css("#headshot img").attrib.get("src", "")
         if "nophoto" in performer_image:
             performer_image = ""
 
@@ -389,14 +441,20 @@ class IafdSpider(scrapy.Spider):
         links = [Link(site=LinkSite.UNKNOWN, quality=LinkQuality.AGGREGATED, url=link) for link in links if link]
 
         ethnicity = response.css(".bioheading:contains(Ethnicity) + .biodata::text").get()
-        if "/" in ethnicity:
+        if ethnicity is not None and "/" in ethnicity:
             ethnicity = Ethnicity.MIXED
-        else:
+        elif ethnicity is not None:
             ethnicity = ETHNICITY_MAP[ethnicity]
 
-        hair_color = HAIR_MAP[response.css(".bioheading:contains(Hair) + .biodata::text").get().split("/")[0]]
-        eye_color = EYE_MAP[response.css(".bioheading:contains(Eye) + .biodata::text").get().strip()]
-        country = NATIONALITY_MAP[response.css(".bioheading:contains(Nationality) + .biodata::text").get().split(",")[0]]
+        hair_color = response.css(".bioheading:contains(Hair) + .biodata::text").get()
+        if hair_color is not None and hair_color.split("/")[0] is not None:
+            hair_color = HAIR_MAP[hair_color.split("/")[0]]
+
+        if eye_color := response.css(".bioheading:contains(Eye) + .biodata::text").get():
+            eye_color = EYE_MAP[eye_color.strip()]
+
+        if country := response.css(".bioheading:contains(Nationality) + .biodata::text").get():
+            country = NATIONALITY_MAP[country.split(",")[0]]
 
         height = response.css(".bioheading:contains(Height) + .biodata::text").get()
         if height and "(" in height:
@@ -439,7 +497,7 @@ class IafdSpider(scrapy.Spider):
             source_name="iafd",
 
             name=response.css("h1::text").get().strip(),
-            gender=GENDER_MAP[response.css(".bioheading:contains(Gender) + .biodata::text").get()],
+            gender=gender,
 
             ethnicity=ethnicity,
             hair_color=hair_color,
